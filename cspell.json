@@ -1,0 +1,13 @@
+{
+    "version": "0.1",
+    "words": [
+        "docgen",
+        "downlevel",
+        "esnext",
+        "multiline",
+        "pnpify",
+        "stylelint",
+        "vercel",
+        "yarnpkg"
+    ]
+}

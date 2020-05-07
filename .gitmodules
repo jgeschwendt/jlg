@@ -1,6 +1,0 @@
-[submodule "packages/jlg-styled-components"]
-	path = packages/jlg-styled-components
-	url = git@github.com:jgeschwendt/jlg-styled-components.git
-[submodule "packages/jlg-styled-media"]
-	path = packages/jlg-styled-media
-	url = git@github.com:jgeschwendt/jlg-styled-media.git
