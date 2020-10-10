@@ -75,7 +75,11 @@
         "caseInsensitive": false,
         "order": "asc"
       },
-      "groups": [["builtin", "external"], "index", "sibling", "parent"]
+      "groups": [["builtin", "external"], "index", "sibling", "parent"],
+      "pathGroups": [
+        { "group": "external", "pattern": "@*/**", "position": "before" },
+        { "group": "parent", "pattern": "../../*", "position": "after" }
+      ]
     }]
   },
   "settings": {

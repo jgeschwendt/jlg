@@ -1,6 +1,1 @@
-export {
-  Col,
-  Container,
-  Row,
-  Spacer,
-} from './components';
+export * from './components';

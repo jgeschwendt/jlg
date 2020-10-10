@@ -2091,38 +2091,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jlg/docs-styled@workspace:docs/styled":
-  version: 0.0.0-use.local
-  resolution: "@jlg/docs-styled@workspace:docs/styled"
-  dependencies:
-    "@babel/core": 7.11.6
-    "@babel/plugin-transform-runtime": 7.11.5
-    "@babel/preset-env": 7.11.5
-    "@babel/preset-react": 7.10.4
-    "@babel/preset-typescript": 7.10.4
-    "@babel/runtime": 7.11.2
-    "@jlg/styled-components": 0.1.0
-    "@jlg/styled-media": 0.1.0
-    "@storybook/addon-actions": ^6.0.26
-    "@storybook/addon-links": ^6.0.26
-    "@storybook/addons": ^6.0.26
-    "@storybook/react": ^6.0.26
-    "@types/react": 16.9.51
-    "@types/react-dom": 16.9.8
-    "@types/styled-components": 5.1.3
-    babel-loader: 8.1.0
-    babel-plugin-styled-components: 1.11.1
-    babel-preset-react-app: 9.1.2
-    core-js: 3.6.5
-    react: 16.13.1
-    react-dom: 16.13.1
-    styled-components: 5.2.0
-    styled-reboot: 5.0.0
-    typescript: 4.0.3
-    webpack: 4.44.2
-  languageName: unknown
-  linkType: soft
-
 "@jlg/styled-components@0.1.0, @jlg/styled-components@workspace:packages/jlg-styled-components":
   version: 0.0.0-use.local
   resolution: "@jlg/styled-components@workspace:packages/jlg-styled-components"
@@ -2153,6 +2121,67 @@ __metadata:
     react: ^16.8.0
     react-dom: ^16.8.0
     styled-components: ^5.1.0
+  languageName: unknown
+  linkType: soft
+
+"@jlg/styled-core@workspace:packages/jlg-styled-core":
+  version: 0.0.0-use.local
+  resolution: "@jlg/styled-core@workspace:packages/jlg-styled-core"
+  dependencies:
+    "@babel/core": ^7.11.6
+    "@babel/plugin-transform-runtime": ^7.11.5
+    "@babel/preset-env": ^7.11.5
+    "@babel/preset-typescript": ^7.10.4
+    "@rollup/plugin-babel": ^5.2.1
+    "@rollup/plugin-commonjs": ^15.1.0
+    "@rollup/plugin-node-resolve": ^9.0.0
+    "@types/react": ^16.9.51
+    "@types/react-dom": ^16.9.8
+    "@types/styled-components": ^5.1.3
+    babel-plugin-styled-components: ^1.11.1
+    core-js: ^3.6.5
+    react: ^16.13.1
+    react-dom: ^16.13.1
+    rollup: ^2.28.2
+    styled-components: ^5.2.0
+    typescript: ^4.0.3
+  peerDependencies:
+    "@babel/runtime": ^7.11.2
+    core-js: ^3.6.5
+    react: ^16.8.0
+    react-dom: ^16.8.0
+    styled-components: ^5.1.0
+  languageName: unknown
+  linkType: soft
+
+"@jlg/styled-docs@workspace:docs/styled":
+  version: 0.0.0-use.local
+  resolution: "@jlg/styled-docs@workspace:docs/styled"
+  dependencies:
+    "@babel/core": 7.11.6
+    "@babel/plugin-transform-runtime": 7.11.5
+    "@babel/preset-env": 7.11.5
+    "@babel/preset-react": 7.10.4
+    "@babel/preset-typescript": 7.10.4
+    "@babel/runtime": 7.11.2
+    "@jlg/styled-components": 0.1.0
+    "@jlg/styled-media": 0.1.0
+    "@storybook/addon-actions": ^6.0.26
+    "@storybook/addon-links": ^6.0.26
+    "@storybook/addons": ^6.0.26
+    "@storybook/react": ^6.0.26
+    "@types/react": 16.9.51
+    "@types/react-dom": 16.9.8
+    "@types/styled-components": 5.1.3
+    babel-loader: 8.1.0
+    babel-plugin-styled-components: 1.11.1
+    babel-preset-react-app: 9.1.2
+    core-js: 3.6.5
+    react: 16.13.1
+    react-dom: 16.13.1
+    styled-components: 5.2.0
+    typescript: 4.0.3
+    webpack: 4.44.2
   languageName: unknown
   linkType: soft
 
@@ -13604,15 +13633,6 @@ fsevents@~2.1.2:
     react-dom: ">= 16.8.0"
     react-is: ">= 16.8.0"
   checksum: 960d40732c26c49539b343a805687cea61a732e47a108f560f505b8a67f86107410b3d9d88292da249ed55cab781ba1a34950a7e548c287a13615149a37e2fe7
-  languageName: node
-  linkType: hard
-
-"styled-reboot@npm:5.0.0":
-  version: 5.0.0
-  resolution: "styled-reboot@npm:5.0.0"
-  peerDependencies:
-    styled-components: ">=4"
-  checksum: fa0d024affcc09e774e8a0004a178bed0cd4c03f5b1f6d3d51b18cdf6cfdb8e4a42e2e91d080e2fe2be7fd1e8c6e59b504f8bddd7f15f9db47a59d890497bc04
   languageName: node
   linkType: hard
 

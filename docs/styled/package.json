@@ -1,5 +1,5 @@
 {
-  "name": "@jlg/docs-styled",
+  "name": "@jlg/styled-docs",
   "version": "0.1.0",
   "description": "Examples using @jlg/styled-components & @jlg/styled-media",
   "dependencies": {
@@ -9,7 +9,7 @@
     "core-js": "3.6.5",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "styled-reboot": "5.0.0"
+    "styled-components": "5.2.0"
   },
   "devDependencies": {
     "@babel/core": "7.11.6",
@@ -27,7 +27,6 @@
     "babel-loader": "8.1.0",
     "babel-plugin-styled-components": "1.11.1",
     "babel-preset-react-app": "9.1.2",
-    "styled-components": "5.2.0",
     "typescript": "4.0.3",
     "webpack": "4.44.2"
   },

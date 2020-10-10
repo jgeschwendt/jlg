@@ -1,7 +1,12 @@
 build:
 	yarn workspace @jlg/styled-media build
 	yarn workspace @jlg/styled-components build
-	yarn workspace @jlg/docs-styled build
+	yarn workspace @jlg/styled-docs build
+
+tsc:
+	yarn workspace @jlg/styled-media tsc
+	yarn workspace @jlg/styled-components tsc
+	yarn workspace @jlg/styled-docs tsc
 
 update:
 	npx ncu -u --dep dev,prod --packageFile ./package.json
