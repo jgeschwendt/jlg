@@ -5,6 +5,7 @@ import pkg from './package.json';
 
 const external = [
   /@babel\/runtime/,
+  'react',
   'styled-components',
 ];
 

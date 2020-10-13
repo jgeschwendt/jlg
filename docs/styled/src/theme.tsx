@@ -30,7 +30,11 @@ export const theme = {
   },
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export const Theme = ({ children }: React.PropsWithChildren<{}>): JSX.Element => (
+export const Theme = ({ children }: React.PropsWithChildren<Record<string, unknown>>): JSX.Element => (
   <ThemeProvider theme={theme}>{children}</ThemeProvider>
 );
+
+// eslint-disable-next-line react/display-name
+export const withTheme = ((Component: () => JSX.Element) => (): JSX.Element => (
+  <Theme><Component /></Theme>
+));
