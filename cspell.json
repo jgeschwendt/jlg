@@ -4,6 +4,7 @@
         "docgen",
         "downlevel",
         "esnext",
+        "flexbox",
         "multiline",
         "pnpify",
         "stylelint",

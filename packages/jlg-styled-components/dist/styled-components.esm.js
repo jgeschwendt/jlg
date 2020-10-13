@@ -28,7 +28,7 @@ var AspectRatio = styled.div.withConfig({
 var marginMap = {
   'm': ['margin'],
   'mb': ['marginBottom'],
-  'ml': ['marginLef'],
+  'ml': ['marginLeft'],
   'mr': ['marginRight'],
   'mt': ['marginTop'],
   'mx': ['marginLeft', 'marginRight'],
@@ -54,6 +54,35 @@ var unpackMargin = function unpackMargin(props, callback) {
   });
   callback(CSS);
 };
+var paddingMap = {
+  'p': ['padding'],
+  'pb': ['paddingBottom'],
+  'pl': ['paddingLeft'],
+  'pr': ['paddingRight'],
+  'pt': ['paddingTop'],
+  'px': ['paddingLeft', 'paddingRight'],
+  'py': ['paddingBottom', 'paddingTop']
+}; // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
+
+var unpackPadding = function unpackPadding(props, callback) {
+  var CSS = {};
+  Object.keys(paddingMap).forEach(function (mKey) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (props[mKey]) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      paddingMap[mKey].forEach(function (cssProp) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        CSS[cssProp] = props[mKey];
+      });
+    }
+  });
+  callback(CSS);
+};
 
 /* eslint @typescript-eslint/no-unsafe-member-access: off */
 var Box = styled.div.withConfig({
@@ -61,15 +90,24 @@ var Box = styled.div.withConfig({
   componentId: "x4g249-0"
 })(["", ""], function (props) {
   var cssProps = [];
-  cssProps.push(css(["box-sizing:border-box;"])); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  cssProps.push(css({
+    boxSizing: 'border-box'
+  })); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
 
   unpackMargin(props, function (CSS) {
     return cssProps.push(css(CSS));
+  }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+
+  unpackPadding(props, function (CSS) {
+    return cssProps.push(css(CSS));
   });
 
-  if (props.p) {
-    cssProps.push(css(["padding:", ";"], props.p));
+  if (typeof props.w === 'number') {
+    cssProps.push(css({
+      width: "".concat(props.w * 100, "%")
+    }));
   }
 
   if (props.theme.breakpoints) {
@@ -80,6 +118,11 @@ var Box = styled.div.withConfig({
           // @ts-expect-error
           unpackMargin(props[breakpoint], function (CSS) {
             return cssProps.push(css(CSS));
+          }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+
+          unpackPadding(props[breakpoint], function (CSS) {
+            return cssProps.push(css(CSS));
           });
         } else {
           if (typeof props[breakpoint] === 'number') {
@@ -87,6 +130,11 @@ var Box = styled.div.withConfig({
           } else {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
+            unpackMargin(props[breakpoint], function (CSS) {
+              return cssProps.push(media.breakpoint.up(breakpoint, css(CSS)));
+            }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+
             unpackMargin(props[breakpoint], function (CSS) {
               return cssProps.push(media.breakpoint.up(breakpoint, css(CSS)));
             });
@@ -120,6 +168,10 @@ var Flex = styled.div.withConfig({
   unpackMargin(props, function (CSS) {
     return cssProps.push(css(CSS));
   });
+
+  if (props.flexDirection) {
+    cssProps.push(css(["flex-direction:", ";"], props.flexDirection));
+  }
 
   if (props.flexWrap) {
     cssProps.push(css(["flex-wrap:", ";"], props.flexWrap));

@@ -5,6 +5,7 @@ import { Layout, Spacer, unpackMargin } from '../../core';
 
 type FlexProps = {
   alignItems?: string;
+  flexDirection?: string;
   flexWrap?: string;
 };
 
@@ -30,6 +31,10 @@ export const Flex = styled.div<BoxProps>`
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     unpackMargin(props, (CSS) => cssProps.push(css(CSS)));
+
+    if (props.flexDirection) {
+      cssProps.push(css`flex-direction: ${props.flexDirection};`);
+    }
 
     if (props.flexWrap) {
       cssProps.push(css`flex-wrap: ${props.flexWrap};`);

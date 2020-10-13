@@ -23,7 +23,7 @@ export type Layout = {
 const marginMap = {
   'm': ['margin'],
   'mb': ['marginBottom'],
-  'ml': ['marginLef'],
+  'ml': ['marginLeft'],
   'mr': ['marginRight'],
   'mt': ['marginTop'],
   'mx': ['marginLeft', 'marginRight'],
@@ -42,6 +42,39 @@ export const unpackMargin = (props: Spacer, callback: (css: object) => void) => 
       // @ts-expect-error
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       marginMap[mKey].forEach((cssProp) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        CSS[cssProp] = props[mKey];
+      });
+    }
+  });
+
+  callback(CSS);
+};
+
+const paddingMap = {
+  'p': ['padding'],
+  'pb': ['paddingBottom'],
+  'pl': ['paddingLeft'],
+  'pr': ['paddingRight'],
+  'pt': ['paddingTop'],
+  'px': ['paddingLeft', 'paddingRight'],
+  'py': ['paddingBottom', 'paddingTop'],
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
+export const unpackPadding = (props: Spacer, callback: (css: object) => void) => {
+  const CSS = {};
+
+  Object.keys(paddingMap).forEach((mKey) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (props[mKey]) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      paddingMap[mKey].forEach((cssProp) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

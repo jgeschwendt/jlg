@@ -41,7 +41,7 @@ var AspectRatio = styled__default['default'].div.withConfig({
 var marginMap = {
   'm': ['margin'],
   'mb': ['marginBottom'],
-  'ml': ['marginLef'],
+  'ml': ['marginLeft'],
   'mr': ['marginRight'],
   'mt': ['marginTop'],
   'mx': ['marginLeft', 'marginRight'],
@@ -67,6 +67,35 @@ var unpackMargin = function unpackMargin(props, callback) {
   });
   callback(CSS);
 };
+var paddingMap = {
+  'p': ['padding'],
+  'pb': ['paddingBottom'],
+  'pl': ['paddingLeft'],
+  'pr': ['paddingRight'],
+  'pt': ['paddingTop'],
+  'px': ['paddingLeft', 'paddingRight'],
+  'py': ['paddingBottom', 'paddingTop']
+}; // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
+
+var unpackPadding = function unpackPadding(props, callback) {
+  var CSS = {};
+  Object.keys(paddingMap).forEach(function (mKey) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (props[mKey]) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      paddingMap[mKey].forEach(function (cssProp) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        CSS[cssProp] = props[mKey];
+      });
+    }
+  });
+  callback(CSS);
+};
 
 /* eslint @typescript-eslint/no-unsafe-member-access: off */
 var Box = styled__default['default'].div.withConfig({
@@ -74,15 +103,24 @@ var Box = styled__default['default'].div.withConfig({
   componentId: "x4g249-0"
 })(["", ""], function (props) {
   var cssProps = [];
-  cssProps.push(styled.css(["box-sizing:border-box;"])); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  cssProps.push(styled.css({
+    boxSizing: 'border-box'
+  })); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
 
   unpackMargin(props, function (CSS) {
     return cssProps.push(styled.css(CSS));
+  }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+
+  unpackPadding(props, function (CSS) {
+    return cssProps.push(styled.css(CSS));
   });
 
-  if (props.p) {
-    cssProps.push(styled.css(["padding:", ";"], props.p));
+  if (typeof props.w === 'number') {
+    cssProps.push(styled.css({
+      width: "".concat(props.w * 100, "%")
+    }));
   }
 
   if (props.theme.breakpoints) {
@@ -93,6 +131,11 @@ var Box = styled__default['default'].div.withConfig({
           // @ts-expect-error
           unpackMargin(props[breakpoint], function (CSS) {
             return cssProps.push(styled.css(CSS));
+          }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+
+          unpackPadding(props[breakpoint], function (CSS) {
+            return cssProps.push(styled.css(CSS));
           });
         } else {
           if (typeof props[breakpoint] === 'number') {
@@ -100,6 +143,11 @@ var Box = styled__default['default'].div.withConfig({
           } else {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
+            unpackMargin(props[breakpoint], function (CSS) {
+              return cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(CSS)));
+            }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+
             unpackMargin(props[breakpoint], function (CSS) {
               return cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(CSS)));
             });
@@ -133,6 +181,10 @@ var Flex = styled__default['default'].div.withConfig({
   unpackMargin(props, function (CSS) {
     return cssProps.push(styled.css(CSS));
   });
+
+  if (props.flexDirection) {
+    cssProps.push(styled.css(["flex-direction:", ";"], props.flexDirection));
+  }
 
   if (props.flexWrap) {
     cssProps.push(styled.css(["flex-wrap:", ";"], props.flexWrap));
