@@ -6,7 +6,8 @@ import { Layout, Spacer, unpackMargin, unpackPadding } from '../../core';
 type FlexProps = Pick<CSSObject,
   'alignItems' |
   'flexDirection' |
-  'flexWrap'
+  'flexWrap' |
+  'justifyContent'
 >;
 
 type BoxProps = DefaultTheme extends { breakpoints: infer U } ? {
@@ -30,6 +31,11 @@ export const Flex = styled.div<BoxProps>`
 
     cssProps.push(css(unpackMargin(props)));
     cssProps.push(css(unpackPadding(props)));
+
+    if (props.alignItems) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      cssProps.push(css({ alignItems: props.alignItems }));
+    }
 
     if (props.flexDirection) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

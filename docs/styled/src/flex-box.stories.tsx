@@ -98,11 +98,11 @@ const Dot = styled.div`
 export const DotsOnDots = withTheme(() => {
   return (
     <Box style={{ outline: '1px solid blue' }}>
-      <Text>Performance Test of {8 * 8 * 4} flexbox items.</Text>
+      <Text>Performance Test of {8 * 8 * 4} unique <code>{'<Box />'}</code> components</Text>
       <Flex flexWrap="wrap">
         <Box w={1 / 2}>
           {[...Array(8).keys()].map((row) => (
-            <Flex key={row} flexDirection="row-reverse">
+            <Flex key={row} alignItems="flex-start" flexDirection="row-reverse">
               {[...Array(8).keys()].map((col) => (
                 <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/2)}%`, mr: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
@@ -113,7 +113,7 @@ export const DotsOnDots = withTheme(() => {
         </Box>
         <Box w={1 / 2}>
           {[...Array(8).keys()].map((row) => (
-            <Flex key={row}>
+            <Flex key={row} alignItems="flex-start">
               {[...Array(8).keys()].map((col) => (
                 <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/2)}%`, ml: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
@@ -124,7 +124,7 @@ export const DotsOnDots = withTheme(() => {
         </Box>
         <Box w={1 / 2}>
           {[...Array(8).keys()].reverse().map((row) => (
-            <Flex key={row} flexDirection="row-reverse">
+            <Flex key={row} alignItems="flex-end" flexDirection="row-reverse">
               {[...Array(8).keys()].map((col) => (
                 <Box key={`${row}-${col}`} all={{ mt: `${((row+1)/2)}%`, mr: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
@@ -135,7 +135,7 @@ export const DotsOnDots = withTheme(() => {
         </Box>
         <Box w={1 / 2}>
           {[...Array(8).keys()].reverse().map((row) => (
-            <Flex key={row}>
+            <Flex key={row} alignItems="flex-end">
               {[...Array(8).keys()].map((col) => (
                 <Box key={`${row}-${col}`} all={{ mt: `${((row+1)/2)}%`, ml: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>

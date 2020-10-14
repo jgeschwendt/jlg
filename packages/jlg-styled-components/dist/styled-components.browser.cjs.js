@@ -163,6 +163,13 @@ var Flex = styled__default['default'].div.withConfig({
   cssProps.push(styled.css(unpackMargin(props)));
   cssProps.push(styled.css(unpackPadding(props)));
 
+  if (props.alignItems) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    cssProps.push(styled.css({
+      alignItems: props.alignItems
+    }));
+  }
+
   if (props.flexDirection) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     cssProps.push(styled.css({

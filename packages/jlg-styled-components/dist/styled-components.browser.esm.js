@@ -149,6 +149,13 @@ var Flex = styled.div.withConfig({
   cssProps.push(css(unpackMargin(props)));
   cssProps.push(css(unpackPadding(props)));
 
+  if (props.alignItems) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    cssProps.push(css({
+      alignItems: props.alignItems
+    }));
+  }
+
   if (props.flexDirection) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     cssProps.push(css({
