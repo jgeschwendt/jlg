@@ -11,6 +11,9 @@
   "module": "dist/styled-components.esm.js",
   "sideEffects": false,
   "types": "src/index.ts",
+  "dependencies": {
+    "deepmerge": "4.2.2"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/plugin-transform-runtime": "^7.11.5",

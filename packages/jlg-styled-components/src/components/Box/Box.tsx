@@ -1,7 +1,15 @@
 /* eslint @typescript-eslint/no-unsafe-member-access: off */
-import media from '@jlg/styled-media';
-import styled, { DefaultTheme, FlattenInterpolation, FlattenSimpleInterpolation, ThemeProps, css } from 'styled-components';
+import styled, {
+  DefaultTheme,
+  FlattenInterpolation,
+  FlattenSimpleInterpolation,
+  ThemeProps,
+  css,
+} from 'styled-components';
 import { Layout, Spacer, unpackMargin, unpackPadding } from '../../core';
+
+// todo: replace later
+const merge = require('deepmerge');
 
 type BoxProps = DefaultTheme extends { breakpoints: infer U } ? {
   [key in keyof U]?: number | Layout & Spacer;
@@ -12,47 +20,55 @@ type BoxProps = DefaultTheme extends { breakpoints: infer U } ? {
   withCSS?: FlattenInterpolation<ThemeProps<DefaultTheme>>;
 };
 
-export const Box = styled.div<BoxProps>`
-  ${(props): FlattenSimpleInterpolation[] => {
-    const cssProps = [];
+export const Box = styled.div<BoxProps>(
+  (props): FlattenSimpleInterpolation[] => {
+    const cssObjects = [];
 
-    cssProps.push(css({ boxSizing: 'border-box' }));
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    unpackMargin(props, (CSS) => cssProps.push(css(CSS)));
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    unpackPadding(props, (CSS) => cssProps.push(css(CSS)));
+    cssObjects.push({ boxSizing: 'border-box' });
+    cssObjects.push(unpackMargin(props));
+    cssObjects.push(unpackPadding(props));
 
     if (typeof props.w === 'number') {
-      cssProps.push(css({ width: `${props.w * 100}%` }));
+      cssObjects.push({ width: `${props.w * 100}%` });
     }
 
     if (props.theme.breakpoints) {
       Object.keys(props.theme.breakpoints).forEach((breakpoint) => {
         if (typeof props[breakpoint] !== 'undefined') {
-          if (props[breakpoint] === 0) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            unpackMargin(props[breakpoint] as Spacer, (CSS) => cssProps.push(css(CSS)));
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            unpackPadding(props[breakpoint] as Spacer, (CSS) => cssProps.push(css(CSS)));
+          if (props.theme.breakpoints[breakpoint] === 0) {
+            cssObjects.push(unpackMargin(props[breakpoint] as Spacer));
+            cssObjects.push(unpackPadding(props[breakpoint] as Spacer));
+
+            if (typeof (props[breakpoint] as Layout).w === 'number') {
+              const w = (props[breakpoint] as Layout).w as number;
+              cssObjects.push({ width: `${w * 100}%` });
+            }
           } else {
             if (typeof props[breakpoint] === 'number') {
-              cssProps.push(media.breakpoint.up(breakpoint, css`width: ${props[breakpoint] as number * 100}%;`));
+              const w = (props[breakpoint] as Layout).w as number;
+              cssObjects.push({
+                [`@media (min-width: ${props.theme.breakpoints[breakpoint]}px)`]: { width: `${w * 100}%` },
+              });
             } else {
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-expect-error
-              unpackMargin(props[breakpoint] as Spacer, (CSS) => cssProps.push(media.breakpoint.up(breakpoint, css(CSS))));
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-expect-error
-              unpackMargin(props[breakpoint] as Spacer, (CSS) => cssProps.push(media.breakpoint.up(breakpoint, css(CSS))));
+              const margins = unpackMargin(props[breakpoint] as Spacer);
+              if (Object.keys(margins).length > 0) {
+                cssObjects.push({
+                  [`@media (min-width: ${props.theme.breakpoints[breakpoint]}px)`]: margins,
+                });
+              }
+
+              const paddings = unpackPadding(props[breakpoint] as Spacer);
+              if (Object.keys(paddings).length > 0) {
+                cssObjects.push({
+                  [`@media (min-width: ${props.theme.breakpoints[breakpoint]}px)`]: paddings,
+                });
+              }
 
               if (typeof (props[breakpoint] as Layout).w === 'number') {
                 const w = (props[breakpoint] as Layout).w as number;
-                cssProps.push(media.breakpoint.up(breakpoint, css`width: ${w * 100}%;`));
+                cssObjects.push({
+                  [`@media (min-width: ${props.theme.breakpoints[breakpoint]}px)`]: { width: `${w * 100}%` },
+                });
               }
             }
           }
@@ -60,6 +76,6 @@ export const Box = styled.div<BoxProps>`
       });
     }
 
-    return cssProps;
-  }}
-`;
+    return css(merge.all(cssObjects));
+  },
+);

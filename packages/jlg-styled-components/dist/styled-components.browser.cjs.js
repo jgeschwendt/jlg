@@ -4,6 +4,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var _slicedToArray = require('@babel/runtime/helpers/slicedToArray');
 var styled = require('styled-components');
+var _defineProperty = require('@babel/runtime/helpers/defineProperty');
 var media = require('@jlg/styled-media');
 var _extends = require('@babel/runtime/helpers/extends');
 var _objectWithoutProperties = require('@babel/runtime/helpers/objectWithoutProperties');
@@ -13,6 +14,7 @@ function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'defau
 
 var _slicedToArray__default = /*#__PURE__*/_interopDefaultLegacy(_slicedToArray);
 var styled__default = /*#__PURE__*/_interopDefaultLegacy(styled);
+var _defineProperty__default = /*#__PURE__*/_interopDefaultLegacy(_defineProperty);
 var media__default = /*#__PURE__*/_interopDefaultLegacy(media);
 var _extends__default = /*#__PURE__*/_interopDefaultLegacy(_extends);
 var _objectWithoutProperties__default = /*#__PURE__*/_interopDefaultLegacy(_objectWithoutProperties);
@@ -46,26 +48,18 @@ var marginMap = {
   'mt': ['marginTop'],
   'mx': ['marginLeft', 'marginRight'],
   'my': ['marginBottom', 'marginTop']
-}; // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
-
-var unpackMargin = function unpackMargin(props, callback) {
-  var CSS = {};
-  Object.keys(marginMap).forEach(function (mKey) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    if (props[mKey]) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      marginMap[mKey].forEach(function (cssProp) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        CSS[cssProp] = props[mKey];
+};
+var marginKeys = Object.keys(marginMap);
+var unpackMargin = function unpackMargin(props) {
+  return Object.keys(props).reduce(function (CSS, prop) {
+    if (marginKeys.includes(prop)) {
+      marginMap[prop].forEach(function (cssProp) {
+        CSS[cssProp] = props[prop];
       });
     }
-  });
-  callback(CSS);
+
+    return CSS;
+  }, {});
 };
 var paddingMap = {
   'p': ['padding'],
@@ -75,86 +69,76 @@ var paddingMap = {
   'pt': ['paddingTop'],
   'px': ['paddingLeft', 'paddingRight'],
   'py': ['paddingBottom', 'paddingTop']
-}; // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
-
-var unpackPadding = function unpackPadding(props, callback) {
-  var CSS = {};
-  Object.keys(paddingMap).forEach(function (mKey) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    if (props[mKey]) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      paddingMap[mKey].forEach(function (cssProp) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        CSS[cssProp] = props[mKey];
+};
+var paddingKeys = Object.keys(paddingMap);
+var unpackPadding = function unpackPadding(props) {
+  return Object.keys(props).reduce(function (CSS, prop) {
+    if (paddingKeys.includes(prop)) {
+      paddingMap[prop].forEach(function (cssProp) {
+        CSS[cssProp] = props[prop];
       });
     }
-  });
-  callback(CSS);
+
+    return CSS;
+  }, {});
 };
 
-/* eslint @typescript-eslint/no-unsafe-member-access: off */
+var merge = require('deepmerge');
+
 var Box = styled__default['default'].div.withConfig({
   displayName: "Box",
   componentId: "x4g249-0"
-})(["", ""], function (props) {
-  var cssProps = [];
-  cssProps.push(styled.css({
+})(function (props) {
+  var cssObjects = [];
+  cssObjects.push({
     boxSizing: 'border-box'
-  })); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-
-  unpackMargin(props, function (CSS) {
-    return cssProps.push(styled.css(CSS));
-  }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-
-  unpackPadding(props, function (CSS) {
-    return cssProps.push(styled.css(CSS));
   });
+  cssObjects.push(unpackMargin(props));
+  cssObjects.push(unpackPadding(props));
 
   if (typeof props.w === 'number') {
-    cssProps.push(styled.css({
+    cssObjects.push({
       width: "".concat(props.w * 100, "%")
-    }));
+    });
   }
 
   if (props.theme.breakpoints) {
     Object.keys(props.theme.breakpoints).forEach(function (breakpoint) {
       if (typeof props[breakpoint] !== 'undefined') {
-        if (props[breakpoint] === 0) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          unpackMargin(props[breakpoint], function (CSS) {
-            return cssProps.push(styled.css(CSS));
-          }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
+        if (props.theme.breakpoints[breakpoint] === 0) {
+          cssObjects.push(unpackMargin(props[breakpoint]));
+          cssObjects.push(unpackPadding(props[breakpoint]));
 
-          unpackPadding(props[breakpoint], function (CSS) {
-            return cssProps.push(styled.css(CSS));
-          });
+          if (typeof props[breakpoint].w === 'number') {
+            var w = props[breakpoint].w;
+            cssObjects.push({
+              width: "".concat(w * 100, "%")
+            });
+          }
         } else {
           if (typeof props[breakpoint] === 'number') {
-            cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(["width:", "%;"], props[breakpoint] * 100)));
+            var _w = props[breakpoint].w;
+            cssObjects.push(_defineProperty__default['default']({}, "@media (min-width: ".concat(props.theme.breakpoints[breakpoint], "px)"), {
+              width: "".concat(_w * 100, "%")
+            }));
           } else {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            unpackMargin(props[breakpoint], function (CSS) {
-              return cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(CSS)));
-            }); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
+            var margins = unpackMargin(props[breakpoint]);
 
-            unpackMargin(props[breakpoint], function (CSS) {
-              return cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(CSS)));
-            });
+            if (Object.keys(margins).length > 0) {
+              cssObjects.push(_defineProperty__default['default']({}, "@media (min-width: ".concat(props.theme.breakpoints[breakpoint], "px)"), margins));
+            }
+
+            var paddings = unpackPadding(props[breakpoint]);
+
+            if (Object.keys(paddings).length > 0) {
+              cssObjects.push(_defineProperty__default['default']({}, "@media (min-width: ".concat(props.theme.breakpoints[breakpoint], "px)"), paddings));
+            }
 
             if (typeof props[breakpoint].w === 'number') {
-              var w = props[breakpoint].w;
-              cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(["width:", "%;"], w * 100)));
+              var _w2 = props[breakpoint].w;
+              cssObjects.push(_defineProperty__default['default']({}, "@media (min-width: ".concat(props.theme.breakpoints[breakpoint], "px)"), {
+                width: "".concat(_w2 * 100, "%")
+              }));
             }
           }
         }
@@ -162,7 +146,7 @@ var Box = styled__default['default'].div.withConfig({
     });
   }
 
-  return cssProps;
+  return styled.css(merge.all(cssObjects));
 });
 
 /* eslint @typescript-eslint/no-unsafe-member-access: off */
@@ -175,43 +159,45 @@ var Flex = styled__default['default'].div.withConfig({
   cssProps.push(styled.css({
     boxSizing: 'border-box',
     display: 'flex'
-  })); // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-
-  unpackMargin(props, function (CSS) {
-    return cssProps.push(styled.css(CSS));
-  });
+  }));
+  cssProps.push(styled.css(unpackMargin(props)));
+  cssProps.push(styled.css(unpackPadding(props)));
 
   if (props.flexDirection) {
-    cssProps.push(styled.css(["flex-direction:", ";"], props.flexDirection));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    cssProps.push(styled.css({
+      flexDirection: props.flexDirection
+    }));
   }
 
   if (props.flexWrap) {
-    cssProps.push(styled.css(["flex-wrap:", ";"], props.flexWrap));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    cssProps.push(styled.css({
+      flexWrap: props.flexWrap
+    }));
   }
 
   if (props.theme.breakpoints) {
     Object.keys(props.theme.breakpoints).forEach(function (breakpoint) {
       if (typeof props[breakpoint] !== 'undefined') {
         if (props[breakpoint] === 0) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          unpackMargin(props[breakpoint], function (CSS) {
-            return cssProps.push(styled.css(CSS));
-          });
+          cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(unpackMargin(props[breakpoint]))));
+          cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(unpackPadding(props[breakpoint]))));
         } else {
           if (typeof props[breakpoint] === 'number') {
-            cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(["width:", "%;"], props[breakpoint] * 100)));
+            var w = props[breakpoint].w;
+            cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css({
+              width: "".concat(w * 100, "%")
+            })));
           } else {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            unpackMargin(props[breakpoint], function (CSS) {
-              return cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(CSS)));
-            });
+            cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(unpackMargin(props[breakpoint]))));
+            cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(unpackPadding(props[breakpoint]))));
 
             if (typeof props[breakpoint].w === 'number') {
-              var w = props[breakpoint].w;
-              cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css(["width:", "%;"], w * 100)));
+              var _w = props[breakpoint].w;
+              cssProps.push(media__default['default'].breakpoint.up(breakpoint, styled.css({
+                width: "".concat(_w * 100, "%")
+              })));
             }
           }
         }
@@ -219,7 +205,9 @@ var Flex = styled__default['default'].div.withConfig({
     });
   }
 
-  return cssProps;
+  return cssProps.filter(function (css) {
+    return Object.keys(css).length > 0;
+  });
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,3 +1,5 @@
+import { CSSObject } from "styled-components";
+
 /* eslint @typescript-eslint/no-unsafe-member-access: off */
 export type Spacer = {
   m?: string;
@@ -30,27 +32,17 @@ const marginMap = {
   'my': ['marginBottom', 'marginTop'],
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
-export const unpackMargin = (props: Spacer, callback: (css: object) => void) => {
-  const CSS = {};
+const marginKeys = Object.keys(marginMap);
 
-  Object.keys(marginMap).forEach((mKey) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    if (props[mKey]) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      marginMap[mKey].forEach((cssProp) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        CSS[cssProp] = props[mKey];
+export const unpackMargin = (props: Spacer): CSSObject => {
+  return Object.keys(props).reduce<CSSObject>((CSS, prop) => {
+    if (marginKeys.includes(prop)) {
+      marginMap[prop as keyof typeof marginMap].forEach((cssProp) => {
+        CSS[cssProp] = props[prop as keyof typeof props];
       });
     }
-  });
-
-  callback(CSS);
+    return CSS;
+  }, {});
 };
 
 const paddingMap = {
@@ -63,25 +55,15 @@ const paddingMap = {
   'py': ['paddingBottom', 'paddingTop'],
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/explicit-module-boundary-types
-export const unpackPadding = (props: Spacer, callback: (css: object) => void) => {
-  const CSS = {};
+const paddingKeys = Object.keys(paddingMap);
 
-  Object.keys(paddingMap).forEach((mKey) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    if (props[mKey]) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      paddingMap[mKey].forEach((cssProp) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        CSS[cssProp] = props[mKey];
+export const unpackPadding = (props: Spacer): CSSObject => {
+  return Object.keys(props).reduce<CSSObject>((CSS, prop) => {
+    if (paddingKeys.includes(prop)) {
+      paddingMap[prop as keyof typeof paddingMap].forEach((cssProp) => {
+        CSS[cssProp] = props[prop as keyof typeof props];
       });
     }
-  });
-
-  callback(CSS);
+    return CSS;
+  }, {});
 };

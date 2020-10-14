@@ -104,7 +104,7 @@ export const DotsOnDots = withTheme(() => {
           {[...Array(8).keys()].map((row) => (
             <Flex key={row} flexDirection="row-reverse">
               {[...Array(8).keys()].map((col) => (
-                <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/3)}%`, mr: `${(row+1)}%`, w: (col+1) / 100 }} >
+                <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/2)}%`, mr: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
                 </Box>
               ))}
@@ -115,7 +115,7 @@ export const DotsOnDots = withTheme(() => {
           {[...Array(8).keys()].map((row) => (
             <Flex key={row}>
               {[...Array(8).keys()].map((col) => (
-                <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/3)}%`, ml: `${(row+1)}%`, w: (col+1) / 100 }} >
+                <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/2)}%`, ml: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
                 </Box>
               ))}
@@ -126,7 +126,7 @@ export const DotsOnDots = withTheme(() => {
           {[...Array(8).keys()].reverse().map((row) => (
             <Flex key={row} flexDirection="row-reverse">
               {[...Array(8).keys()].map((col) => (
-                <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/3)}%`, mr: `${(row+1)}%`, w: (col+1) / 100 }} >
+                <Box key={`${row}-${col}`} all={{ mt: `${((row+1)/2)}%`, mr: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
                 </Box>
               ))}
@@ -137,7 +137,7 @@ export const DotsOnDots = withTheme(() => {
           {[...Array(8).keys()].reverse().map((row) => (
             <Flex key={row}>
               {[...Array(8).keys()].map((col) => (
-                <Box key={`${row}-${col}`} all={{ mb: `${((row+1)/3)}%`, ml: `${(row+1)}%`, w: (col+1) / 100 }} >
+                <Box key={`${row}-${col}`} all={{ mt: `${((row+1)/2)}%`, ml: `${(row+1)}%`, w: (col+1) / 100 }} >
                   <Dot/>
                 </Box>
               ))}
