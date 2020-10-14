@@ -132,7 +132,7 @@ var Box = styled.div.withConfig({
     });
   }
 
-  return css(merge.all(cssObjects));
+  return merge.all(cssObjects);
 });
 
 /* eslint @typescript-eslint/no-unsafe-member-access: off */

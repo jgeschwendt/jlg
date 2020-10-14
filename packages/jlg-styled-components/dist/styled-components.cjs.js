@@ -146,7 +146,7 @@ var Box = styled__default['default'].div.withConfig({
     });
   }
 
-  return styled.css(merge.all(cssObjects));
+  return merge.all(cssObjects);
 });
 
 /* eslint @typescript-eslint/no-unsafe-member-access: off */

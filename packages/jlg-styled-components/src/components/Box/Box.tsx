@@ -4,7 +4,6 @@ import styled, {
   FlattenInterpolation,
   FlattenSimpleInterpolation,
   ThemeProps,
-  css,
 } from 'styled-components';
 import { Layout, Spacer, unpackMargin, unpackPadding } from '../../core';
 
@@ -76,6 +75,6 @@ export const Box = styled.div<BoxProps>(
       });
     }
 
-    return css(merge.all(cssObjects));
+    return merge.all(cssObjects);
   },
 );
