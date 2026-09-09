@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# The branch ruleset on main requires the status check whose context is exactly
+# `check` — the job id below. Renaming the job breaks every PR's merge gate.
+concurrency:
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # stele freshness walks git blame over the anchored code — needs full history.
+          fetch-depth: 0
+      - uses: jdx/mise-action@v2
+
+      # bun-only toolchain: shadow the runner's node so any node-shebang bin or
+      # hardcoded `node` spawn resolves to bun (the same symlink dev machines carry).
+      - run: mkdir -p ~/.local/bin && ln -sf "$(command -v bun)" ~/.local/bin/node && echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - run: bun install --frozen-lockfile
+      - run: bun run fmt:check
+      - run: bun run lint
+      - run: bun test
+
+      # stele:landmark changeset-guard
+      # MINIMUM BUMP: pre-1.0 a breaking change is a `minor` changeset and
+      # everything else is `patch`; `major` is forbidden until a deliberate 1.0,
+      # so a `major` in any pending changeset fails this job. (Patch releases
+      # land on their own; minor waits for the owner's merge — see
+      # release.yaml's approval gate.) grep, not rg —
+      # ripgrep is not on the runner and mise pins only bun and node. The
+      # optional `.` before and after the package name absorbs whichever quote
+      # style the changeset carries (`@jlg/oxlint:`, `'@jlg/oxlint':`, `"…":`).
+      - name: changeset guard
+        run: |
+          majors=$(grep -rEl --include='*.md' --exclude=README.md \
+            '^[[:space:]]*.?@jlg/[a-z]+.?[[:space:]]*:[[:space:]]*major[[:space:]]*$' \
+            .changeset || true)
+          if [ -n "$majors" ]; then
+            echo "::error::major bump forbidden pre-1.0 — rewrite as minor (breaking) or patch: $majors"
+            exit 1
+          fi
+
+      # stele: assert the agent-doc graph is fresh (anchors resolve, claims not
+      # staled by drift) and the committed AGENTS.md / index files match the lock.
+      # Pinned to the binary the lock was built with; CI never runs `stele build`
+      # (that would launder staleness). liveness resolves the nodes' `bun`/`bunx`
+      # commands against the PATH mise-action set up above.
+      - run: curl -fsSL https://raw.githubusercontent.com/jgeschwendt/stele/main/scripts/install.sh | bash -s v0.2.0
+      - run: ~/.local/bin/stele check
+      - run: ~/.local/bin/stele emit --check

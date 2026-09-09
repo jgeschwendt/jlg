@@ -10,7 +10,7 @@ import {
 } from './_lib.js';
 
 // The footgun guard. Two ways a config rule silently stops doing its job in
-// oxlint 1.74 (verified 2026-07-19):
+// oxlint (re-verified 2026-09-08 · probe, oxlint 1.82):
 //
 //  1. An unknown rule NAME, or an unknown PLUGIN name, makes oxlint reject the
 //     WHOLE config ("Failed to parse … Rule 'x' not found in plugin 'y'" /

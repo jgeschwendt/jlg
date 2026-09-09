@@ -1,22 +1,28 @@
 {
-  "name": "typescript",
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.2",
     "lefthook": "^2.1.12",
     "oxfmt": "^0.67.0",
     "oxlint": "^1.82.0",
     "oxlint-tsgolint": "^7.0.2001"
   },
+  "name": "typescript-monorepo",
+  "private": true,
   "scripts": {
+    "changeset": "changeset",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "lint": "oxlint",
-    "ncu": "bunx npm-check-updates -u",
-    "update": "bunx npm-check-updates -u && bun install"
+    "lint": "oxlint --report-unused-disable-directives",
+    "ncu": "bunx npm-check-updates -u --workspaces",
+    "release": "changeset publish",
+    "update": "bunx npm-check-updates -u --workspaces && bun install",
+    "version-packages": "changeset version && bun install --lockfile-only"
   },
   "trustedDependencies": [
     "lefthook"
+  ],
+  "workspaces": [
+    "packages/*"
   ]
 }
