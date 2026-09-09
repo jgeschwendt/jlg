@@ -18,7 +18,7 @@ jobs:
     name: check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # stele freshness walks git blame over the anchored code — needs full history.
           fetch-depth: 0
