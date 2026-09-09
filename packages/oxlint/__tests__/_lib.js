@@ -1,7 +1,6 @@
 // Shared helpers for the oxlint config tests. Not a test file (bun test only
 // discovers `*.test.*` / `*.spec.*`), so it is never run on its own.
 
-import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
@@ -29,17 +28,34 @@ const configPath = join(here, '..', 'oxlintrc.jsonc');
 // package) is broken — including while test 1's own fixture deliberately breaks
 // it. Run from an isolated temp dir holding an empty `{}` config so the catalog
 // is always readable and this helper never masks the assertion that should fire.
+//
+// stdout goes to a FILE in that temp dir, not a pipe: the catalog is ~230 kB,
+// and on the Linux runner a piped read came back truncated mid-string
+// ("JSON Parse error: Unterminated string") in one of the two callers while
+// the other, identical spawn succeeded — a pipe race, not a size cap.
+// (observed 2026-09-09 · ci run 34302573741, bun 1.3.14 on ubuntu-latest)
 export function loadRules() {
   const dir = mkdtempSync(join(tmpdir(), 'oxlint-rules-'));
   try {
     writeFileSync(join(dir, '.oxlintrc.json'), '{}');
-    return JSON.parse(
-      execFileSync(
+    const out = join(dir, 'rules.json');
+    const result = Bun.spawnSync(
+      [
         process.execPath,
-        [oxlintBin, '--rules', '--format', 'json', '--disable-nested-config'],
-        { cwd: dir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-      ),
+        oxlintBin,
+        '--rules',
+        '--format',
+        'json',
+        '--disable-nested-config',
+      ],
+      { cwd: dir, stderr: 'pipe', stdout: Bun.file(out) },
     );
+    if (result.exitCode !== 0) {
+      throw new Error(
+        `oxlint --rules exited ${result.exitCode}: ${result.stderr.toString()}`,
+      );
+    }
+    return JSON.parse(readFileSync(out, 'utf8'));
   } finally {
     rmSync(dir, { force: true, recursive: true });
   }
