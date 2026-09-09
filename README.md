@@ -20,7 +20,8 @@ Each package README carries its own install and composition paths — the JS ent
 
 1. Every change that touches a package ships with a changeset — `bun run changeset`.
 2. A push to `main` with pending changesets opens (or refreshes) the **Version
-   Packages** PR, which auto-merges the moment `check` goes green.
+   Packages** PR. Patch-only, it auto-merges the moment `check` goes green;
+   minor or major, it waits for the owner's merge.
 3. Merging it publishes from `.github/workflows/release.yaml` over npm trusted
    publishing — no npm token anywhere, provenance attached automatically.
 
@@ -33,7 +34,13 @@ root's missing version, and every `changeset` command dies with an opaque
 
 **Minimum bump.** Pre-1.0 the smallest honest bump wins: a breaking change is a
 `minor` changeset, everything else is `patch`. `major` is forbidden until a
-deliberate 1.0, and the `check` job fails on one.
+deliberate 1.0, and the `check` job fails on one. Patch should almost always be
+the answer.
+
+**Who releases what.** A patch-only Version Packages PR auto-merges and ships
+itself. One carrying a `minor` (or, after 1.0, a `major`) is not auto-merged:
+`release.yaml` requests the owner's review instead, and the hand merge is the
+approval.
 
 ### Bootstrap
 

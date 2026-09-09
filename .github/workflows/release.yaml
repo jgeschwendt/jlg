@@ -70,6 +70,21 @@ jobs:
           permission-pull-requests: write
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
+      # stele:landmark release-approval-gate
+      # RELEASE APPROVAL — a patch release lands on its own; a minor (or, after
+      # 1.0, a major) waits for the owner: this step reads the pending changesets
+      # BEFORE `changeset version` consumes them, and the auto-merge step below is
+      # skipped when any of them bumps more than patch. The Version Packages PR
+      # then sits with a review request until it is merged by hand — that merge is
+      # the approval. Patch should almost always be the answer.
+      - id: bumps
+        run: |
+          if grep -rEq --include='*.md' --exclude=README.md \
+            '^[[:space:]]*.?@jlg/[a-z]+.?[[:space:]]*:[[:space:]]*(minor|major)[[:space:]]*$' \
+            .changeset; then
+            echo "gated=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - id: version
         uses: changesets/action/version@v2
         with:
@@ -78,12 +93,20 @@ jobs:
           pr-title: 'task(//): version packages'
           script: bun run version-packages
 
-      # Hands the PR to GitHub's merge queue-of-one: it lands itself the moment
-      # `check` goes green, so a release needs no second human action.
-      - if: steps.version.outputs.pr-number != ''
+      # Patch only: hands the PR to GitHub's merge queue-of-one, so it lands
+      # itself the moment `check` goes green and the release needs no second
+      # human action.
+      - if: steps.version.outputs.pr-number != '' && steps.bumps.outputs.gated != 'true'
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: gh pr merge ${{ steps.version.outputs.pr-number }} --auto --squash
+
+      # Minor or major: no auto-merge; ask the owner to review, and let the
+      # merge be the approval.
+      - if: steps.version.outputs.pr-number != '' && steps.bumps.outputs.gated == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: gh pr edit ${{ steps.version.outputs.pr-number }} --add-reviewer jgeschwendt || true
 
   # Packs the tarballs in a job with no id-token, so the publish job below is the
   # only place an OIDC credential exists.

@@ -36,7 +36,9 @@ jobs:
       # stele:landmark changeset-guard
       # MINIMUM BUMP: pre-1.0 a breaking change is a `minor` changeset and
       # everything else is `patch`; `major` is forbidden until a deliberate 1.0,
-      # so a `major` in any pending changeset fails this job. grep, not rg —
+      # so a `major` in any pending changeset fails this job. (Patch releases
+      # land on their own; minor waits for the owner's merge — see
+      # release.yaml's approval gate.) grep, not rg —
       # ripgrep is not on the runner and mise pins only bun and node. The
       # optional `.` before and after the package name absorbs whichever quote
       # style the changeset carries (`@jlg/oxlint:`, `'@jlg/oxlint':`, `"…":`).
