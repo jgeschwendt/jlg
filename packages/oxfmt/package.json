@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "oxfmt": "^0.59.0"
+    "oxfmt": "^0.67.0"
   },
   "exports": {
     ".": {
@@ -17,11 +17,19 @@
   ],
   "name": "@jlg/oxfmt",
   "peerDependencies": {
-    "oxfmt": "^0.59.0"
+    "oxfmt": ">=0.59.0 <1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgeschwendt/typescript.git",
+    "directory": "packages/oxfmt"
   },
   "scripts": {
     "test": "bun test"
   },
   "type": "module",
-  "version": "0.3.0"
+  "version": "0.1.0"
 }

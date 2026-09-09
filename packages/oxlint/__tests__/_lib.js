@@ -21,7 +21,7 @@ const schemaPath = join(oxlintDir, 'configuration_schema.json');
 const configPath = join(here, '..', 'oxlintrc.jsonc');
 
 // The full rule catalog: `[{ scope, value, category, type_aware, ... }, …]`.
-// 841 rules as of oxlint 1.74. Spawned through `process.execPath` so it works
+// 870 rules as of oxlint 1.82 (measured 2026-09-08 · `oxlint --rules --format json`). Spawned through `process.execPath` so it works
 // regardless of the bin's exec bit or PATH.
 //
 // `--rules` still performs oxlint's config discovery and exits non-zero if the

@@ -14,10 +14,12 @@ invariants:
 hazards:
   - claim: FOOTGUN — an unknown rule NAME hard-fails the whole oxlint config (exit 1, nothing lints); a valid rule whose plugin isn't enabled is a SILENT no-op; both guarded by rule-existence.test.js
     anchor: lm:rule-existence-guard
-  - claim: VERSION PAIRING — oxlint 1.75 requires oxlint-tsgolint >=7.0.2001; an old tsgolint breaks type-aware SILENTLY ('Failed to find tsgolint executable') and a TS-free repo still lints green; probe type-aware directly when bumping
+  - claim: VERSION PAIRING — oxlint 1.82 declares peer oxlint-tsgolint >=7.0.2001 (probed 2026-09-08); an old tsgolint breaks type-aware SILENTLY ('Failed to find tsgolint executable') and a TS-free repo still lints green; probe type-aware directly when bumping
     anchor: lm:oxlint-tsgolint-pairing
   - claim: PEER COUPLING — naming a version-N-only rule in oxlintrc.jsonc forces peerDependencies.oxlint to ^N (older consumers hard-fail on the unknown name); category-activated rules don't
     anchor: lm:oxlint-peer-coupling
+  - claim: SNAPSHOT RESOLUTION — the guard tests resolve oxlint from packages/oxlint/node_modules first, so a root-only oxlint bump leaves packages/oxlint's devDependency (and the regenerated snapshot) on the OLD catalog with a silent no-diff; bump both package.json files together
+    anchor: packages/oxlint/README.md#testing
   - claim: JS-CONFIG RUNTIME — oxlint/oxfmt .config.ts files evaluate under Node >=22.18 even when invoked via bun; in a JS config oxlint `extends` takes config OBJECTS, not path strings
     anchor: lm:oxlint-extends-objects
 ```

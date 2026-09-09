@@ -1,0 +1,13 @@
+# stele check/emit-time settings (not an input to `build`/the lock — SPEC §3.4).
+#
+# Exhaustiveness (§4.3) requires every top-level directory to fall in some
+# non-root node's territory. This graph is root (system) + packages (container)
+# + the two package nodes; the remaining top-level dirs carry no local knowledge
+# a root claim does not already route to:
+#   .changeset  → pending release notes; the MINIMUM BUMP invariant governs them
+#   .github     → CI and release; the MINIMUM BUMP invariant and the VERSION PR
+#                 TOKEN hazard both anchor into these workflows
+# Excluding a dir here drops only its exhaustiveness requirement; the anchor scan
+# still sees it, so lm:changeset-guard and lm:release-app-token keep resolving.
+[exhaustiveness]
+exclude = ["node_modules", "_build", "deps", "target", ".changeset", ".github"]

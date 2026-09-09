@@ -20,7 +20,8 @@ import { defineConfig } from '@jlg/oxlint';
 export default defineConfig({
   // Ignores belong in the CONSUMING config — see "Caveats" below.
   ignorePatterns: ['**/*.d.ts'],
-  // Type-aware linting is root-only — see "Type-aware linting" below. Requires
+  // Type-aware linting belongs in this root config — see "Type-aware linting"
+  // below. Requires
   // the `oxlint-tsgolint` package + TypeScript 7+.
   options: { typeAware: true },
   // Your own plugins / rules / overrides compose on top of the base.
@@ -58,20 +59,11 @@ config's own location:
   "extends": ["./node_modules/@jlg/oxlint/oxlintrc.jsonc"],
   // Ignores belong HERE, not in the base — see "Caveats" below.
   "ignorePatterns": ["**/*.d.ts"],
-  // Type-aware linting is enabled from the ROOT only — see "Type-aware
+  // Type-aware linting belongs in this root config — see "Type-aware
   // linting" below. Requires the `oxlint-tsgolint` package + TypeScript 7+.
   "options": { "typeAware": true },
 }
 ```
-
-> **Interim install path (2026-07-19).** `@jlg/oxlint` on npmjs is the permanent
-> home. Until then the package is published to GitHub Packages under the repo
-> owner's scope as **`@jgeschwendt/oxlint`** (GitHub Packages requires the scope
-> to equal the repo owner). Installed from there, the import specifier is
-> `@jgeschwendt/oxlint` (and the JSON `extends` path
-> `./node_modules/@jgeschwendt/oxlint/oxlintrc.jsonc`) — same package, different
-> scope directory. Point your `.npmrc` at the registry for that scope:
-> `@jgeschwendt:registry=https://npm.pkg.github.com`.
 
 ## Philosophy
 
@@ -85,22 +77,63 @@ Plugins enabled: `eslint` (core), `import`, `oxc`, `react`, `typescript`,
 `unicorn`. `react` also covers react-hooks rules (`react/rules-of-hooks`,
 `react/hook-use-state`) — oxlint has no separate react-hooks plugin.
 
+## React Compiler rules (oxlint ≥1.80)
+
+oxlint 1.80 added **22 React Compiler rules** to the `react` plugin
+([announcement](https://oxc.rs/blog/2026-08-18-react-compiler-support);
+inventory confirmed 2026-09-08 via the rule-inventory diff). They arrive with
+categories attached, so this config's categories-at-error stance activates all
+of them without naming any:
+
+| category      | severity here | rules                                                                                                                                                                                                                  |
+| ------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `correctness` | error         | `error-boundaries`, `globals`, `immutability`, `incompatible-library`, `preserve-manual-memoization`, `purity`, `refs`, `set-state-in-effect`, `set-state-in-render`, `static-components`, `use-memo`, `void-use-memo` |
+| `perf`        | error         | `no-deriving-state-in-effects`                                                                                                                                                                                         |
+| `suspicious`  | error         | `capitalized-calls`, `exhaustive-effect-dependencies`, `hooks`, `memo-dependencies`                                                                                                                                    |
+| `restriction` | warn          | `invariant`, `rule-suppression`, `syntax`, `todo`, `unsupported-syntax`                                                                                                                                                |
+
+Upstream's own ESLint preset ships five of them **off**
+(`no-deriving-state-in-effects`, `capitalized-calls`,
+`exhaustive-effect-dependencies`, `hooks`, `memo-dependencies`); this base
+**deliberately keeps them on** at their category severity. Evidence they are
+tolerable: `jgeschwendt/jlg.io`, a Next.js consumer of this base with
+`typeAware: true`, has green CI on `main` at oxlint 1.81 with none of the 22
+disabled (runs 2026-09-07/08, verified 2026-09-08).
+
+None of the 22 is named in `oxlintrc.jsonc` — naming even one would raise the
+declared peer to `oxlint ^1.80.0` (see the peer-coupling note under
+`react/function-component-definition`). A consumer that disagrees turns a rule
+off in its **own** root config:
+
+```jsonc
+// .oxlintrc.json at your repo root
+{
+  "extends": ["./node_modules/@jlg/oxlint/oxlintrc.jsonc"],
+  "rules": { "react/exhaustive-effect-dependencies": "off" },
+}
+```
+
+The nursery rule `react/react-compiler` was **removed** in 1.80 in favor of
+these 22; it was never named here, so nothing needed removing.
+
 ## What maps from `@jlg/eslint`
 
-| `@jlg/eslint` rule                     | oxlint rule                      | notes                                               |
-| -------------------------------------- | -------------------------------- | --------------------------------------------------- |
-| `no-void` (allowAsStatement)           | `no-void`                        | ported verbatim                                     |
-| `sort-imports` (ignoreDeclarationSort) | `sort-imports`                   | ported verbatim                                     |
-| `no-magic-numbers` (warn + options)    | `no-magic-numbers`               | option subset honored (see below)                   |
-| `capitalized-comments` off             | `capitalized-comments` off       |                                                     |
-| `max-lines` / `max-lines-per-function` | same, off                        |                                                     |
-| `no-ternary` / `no-undefined` off      | same, off                        |                                                     |
-| `react/jsx-curly-brace-presence`       | `react/jsx-curly-brace-presence` | ported verbatim                                     |
-| `react/react-in-jsx-scope` off         | `react/react-in-jsx-scope` off   |                                                     |
-| `import/no-default-export` error       | `import/no-default-export`       | + `no-named-export` / `prefer-default-export` off   |
-| Next routing → `unicorn/filename-case` | same override                    | kebab-case                                          |
-| Next default-export files              | `import/no-default-export` off   | layout/page/middleware/instrumentation/robots/route |
-| tooling config files                   | `import/no-default-export` off   | eslint/jest/next/postcss/oxlint config              |
+| `@jlg/eslint` rule                      | oxlint rule                      | notes                                               |
+| --------------------------------------- | -------------------------------- | --------------------------------------------------- |
+| `no-void` (allowAsStatement)            | `no-void`                        | ported verbatim                                     |
+| `sort-imports` (ignoreDeclarationSort)  | `sort-imports`                   | ported verbatim                                     |
+| `one-var` (["error","never"])           | `one-var`                        | ported verbatim; rule added in oxlint 1.78          |
+| `no-magic-numbers` (warn + options)     | `no-magic-numbers`               | option subset honored (see below)                   |
+| `capitalized-comments` off              | `capitalized-comments` off       |                                                     |
+| `max-lines` / `max-lines-per-function`  | same, off                        |                                                     |
+| `no-ternary` / `no-undefined` off       | same, off                        |                                                     |
+| `react/jsx-curly-brace-presence`        | `react/jsx-curly-brace-presence` | ported verbatim                                     |
+| `react/react-in-jsx-scope` off          | `react/react-in-jsx-scope` off   |                                                     |
+| `import/no-default-export` error        | `import/no-default-export`       | + `no-named-export` / `prefer-default-export` off   |
+| Next routing → `unicorn/filename-case`  | same override                    | kebab-case                                          |
+| Next default-export files               | `import/no-default-export` off   | layout/page/middleware/instrumentation/robots/route |
+| tooling config files                    | `import/no-default-export` off   | eslint/jest/next/postcss/oxlint config              |
+| `require-await` off for instrumentation | `typescript/require-await` off   | override on `**/instrumentation.{js,ts}`            |
 
 `no-magic-numbers` is passed the full `@jlg/eslint` option object. oxlint honors
 the subset it implements — verified working: `ignore`, `detectObjects`,
@@ -109,12 +142,10 @@ TS-specific keys (`ignoreNumericLiteralTypes`, `ignoreReadonlyClassProperties`,
 `ignoreTypeIndexes`, `ignoreClassFieldInitialValues`) are inert but kept for
 parity and forward-compatibility.
 
-## What was DROPPED (no oxlint equivalent as of oxlint 1.75; re-checked 2026-07-23 via the rule-inventory diff — 1.75 added only react/function-component-definition)
+## What was DROPPED (no oxlint equivalent as of oxlint 1.82; re-checked 2026-09-08 against oxlint 1.82 via the rule-inventory diff)
 
 Verified against `oxlint --rules --format json`:
 
-- **`one-var`** — core rule absent from oxlint. `@jlg/eslint` set it to
-  `["error", "never"]`; nothing to map to.
 - **`@typescript-eslint/naming-convention`** → `typescript/naming-convention`
   **absent**. This is the biggest gap: `@jlg/eslint` carried extensive
   naming-convention blocks (default/type/parameter/enum-member casing, plus
@@ -131,8 +162,11 @@ Verified against `oxlint --rules --format json`:
   them (e.g. `func-style` declaration-vs-expression by Next file type,
   `group-exports: off` for `route`/`page`) was **not** ported. They remain at
   their global category severity. Retune per-file here if needed.
-- **`@typescript-eslint/require-await` off for `instrumentation.ts`** — the rule
-  exists (`typescript/require-await`) but the per-file exception was not ported.
+
+`one-var` left this list on 2026-09-08: oxlint implemented it in 1.78 and the
+`["error", "never"]` policy is now ported (see the mapping table above). The
+`@typescript-eslint/require-await` exemption for `instrumentation.ts` is ported
+too, as an override on `**/instrumentation.{js,ts}`.
 
 ## Type-aware linting
 
@@ -142,11 +176,23 @@ Type-aware `typescript/*` rules are **enabled** (as of 2026-07-19, TypeScript
 1. the **`oxlint-tsgolint`** package installed (a root devDependency here), and
 2. **TypeScript 7.0+** — tsgolint runs the native `typescript-go` type checker.
 
+The two move together: oxlint 1.82.0 declares
+`peerDependencies: { "oxlint-tsgolint": ">=7.0.2001" }`, and the pairing oxlint
+1.82.0 + oxlint-tsgolint 7.0.2001 + typescript 7.0.2 was probed directly —
+`typescript/no-floating-promises` fires (verified 2026-09-08 · direct probe). An
+oxlint-tsgolint older than the declared peer breaks type-aware linting
+_silently_ ("Failed to find tsgolint executable"), so probe a type-aware rule
+after any bump rather than trusting a green run.
+
 It is switched on with `"options": { "typeAware": true }` — equivalent to the
-`--type-aware` CLI flag. That flag is **root-only**: oxlint honors `options` from
-the consuming root config only (`oxlint.config.ts` or `.oxlintrc.json`), not from
-an extended config, so it must live in your root config and never in this shared
-base. The base file instead
+`--type-aware` CLI flag. Set it in **your root config** (`oxlint.config.ts` or
+`.oxlintrc.json`), never in this shared base: the configuration schema documents
+every `options` key as "Only supported in the root configuration file". An
+extended config's `options` were _observed_ to take effect at oxlint 1.78, 1.80
+and 1.82 (probed 2026-09-08 · `typeAware` and `reportUnusedDisableDirectives` both
+fired from a config reached only via `extends`), but this base does not rely on
+behavior the schema calls unsupported — an upstream fix would silently switch
+type-aware linting off for every consumer. The base file instead
 retunes the type-checked rules (see the "type-aware retuning" section in
 `oxlintrc.jsonc`); currently `typescript/prefer-readonly-parameter-types` is
 demoted from error to **warn** — it demands `readonly` on every non-primitive
@@ -156,7 +202,7 @@ strict on the React/Next stack this config targets.
 ## Caveats
 
 - **Rule-name / plugin footgun.** Two ways a rule can quietly stop doing its job
-  (verified 2026-07-19, oxlint 1.74):
+  (re-verified 2026-09-08 · probe, oxlint 1.82):
   - An unknown/misspelled rule _name_, or an unknown _plugin_ name, makes oxlint
     reject the **entire** config — `Failed to parse … Rule 'x' not found in
 plugin 'y'` (or `Unknown plugin`), exit 1, nothing lints — the same when the
@@ -174,6 +220,15 @@ plugin 'y'` (or `Unknown plugin`), exit 1, nothing lints — the same when the
   instead. Verify new rule names against `oxlint --rules --format json` (the test
   does this for you).
 
+- **Unused-directive reporting is a root-config concern too.** oxlint reports
+  stale `// oxlint-disable` / `// eslint-disable` comments either via the CLI flag
+  `--report-unused-disable-directives` (bare flag reports at **warn**;
+  `--report-unused-disable-directives-severity=error` for error) or via
+  `options.reportUnusedDisableDirectives: "warn" | "error"` in the root config
+  (key present and honored at oxlint 1.78, 1.80 and 1.82 — probed 2026-09-08;
+  the schema marks it root-only and says CLI flags take precedence). This base
+  sets neither, for the same reason it never sets `typeAware`; this repo's own
+  `lint` script passes the flag.
 - **`restriction` is `warn`, not `error`.** oxlint's `restriction` category is
   dominated by the `oxc` plugin's language-feature bans
   (`no-optional-chaining`, `no-rest-spread-properties`, `no-async-await`, …)
@@ -219,6 +274,15 @@ After an **intentional** oxlint bump, review the inventory diff, then regenerate
 ```sh
 bun run --filter '@jlg/oxlint' test --update-snapshots
 ```
+
+The catalog the tests read comes from the `oxlint` that Node resolution finds
+from `packages/oxlint/__tests__/` — `packages/oxlint/node_modules/oxlint` first,
+the hoisted root copy second. Bumping only the root `devDependencies.oxlint`
+therefore leaves the tests, and a regenerated snapshot, on the **old** catalog
+with a silent no-diff; bump `packages/oxlint/package.json`'s `devDependencies.oxlint`
+in the same change and confirm `packages/oxlint/node_modules/oxlint/package.json`
+reports the new version before regenerating. (observed 2026-09-08 · the 1.75 → 1.82
+bump regenerated a no-diff snapshot until the package-level pin moved)
 
 Snapshots live in Bun's `__snapshots__/` directory next to the tests
 (`__tests__/__snapshots__/*.snap`, jest-format) and are committed.

@@ -16,14 +16,21 @@ The base carries only the shared stack opinion (single quotes):
 
 Repo-local concerns — `printWidth`, `sortPackageJson`, `sortTailwindcss`, ignore
 patterns — deliberately stay out of it; each consumer sets those in its own config
-alongside the merged base (since 2026-07-22, 0.2.0; ≤0.1.0 shipped
-`printWidth`/`sortPackageJson` instead).
+alongside the merged base.
 
-> **No `extends` (verified 2026-07-22, oxfmt 0.59).** Unlike `@jlg/oxlint` — whose
+Because the base carries only `singleQuote` — a key that is valid, and unchanged
+in default, across the whole 0.59 → 0.67 range (verified 2026-09-08 against oxfmt
+0.67's `configuration_schema.json`: one key added, none removed, no defaults
+changed) — the package declares a deliberately wide peer, `oxfmt >=0.59.0
+<1.0.0`. A caret range (`^0.59.0`, i.e. `>=0.59.0 <0.60.0` under npm semver for
+0.x) would leave every consumer on 0.60+ with an unsatisfied peer for no reason.
+
+> **No `extends` (re-verified 2026-09-08 against oxfmt 0.67).** Unlike `@jlg/oxlint` — whose
 > `oxlintrc.jsonc` composes into a consumer via `extends` — oxfmt has **no**
 > `extends` mechanism: its configuration schema has no such key (confirmed against
-> `node_modules/oxfmt/configuration_schema.json`). This package therefore cannot be
-> composed by reference; `defineConfig` composes it by **merge** instead (base
+> `node_modules/oxfmt/configuration_schema.json` at 0.67.0 — the 0.59 → 0.67 schema
+> gained exactly one key, `experimentalOperatorPosition`, and lost none). This
+> package therefore cannot be composed by reference; `defineConfig` composes it by **merge** instead (base
 > first, your keys win), and the raw-JSON alternatives below either point oxfmt at
 > the shipped file with `-c` or import and spread it.
 
@@ -81,24 +88,6 @@ import base from '@jlg/oxfmt/oxfmtrc.json' with { type: 'json' };
 
 export default { ...base, sortTailwindcss: true };
 ```
-
-> **Breaking change, 0.2.0 → 0.3.0.** In 0.2.0 the package's main export (`"."`)
-> resolved to the raw `oxfmtrc.json`, so consumers wrote
-> `import base from '@jlg/oxfmt' with { type: 'json' }`. In 0.3.0 `"."` resolves to
-> the JS entry (`defineConfig` + `base`), and the raw JSON moved to the
-> **`@jlg/oxfmt/oxfmtrc.json`** subpath. A JSON import of the bare `"."` specifier
-> will now load a JS module and fail — switch it to the subpath above, or migrate to
-> `defineConfig`.
-
-> **Interim install path (2026-07-19).** `@jlg/oxfmt` on npmjs is the permanent
-> home. Until then the package is published to GitHub Packages under the repo
-> owner's scope as **`@jgeschwendt/oxfmt`** (GitHub Packages requires the scope to
-> equal the repo owner). Installed from there, the import specifier is
-> `@jgeschwendt/oxfmt` (and the raw paths above become
-> `node_modules/@jgeschwendt/oxfmt/oxfmtrc.json` and
-> `import base from "@jgeschwendt/oxfmt/oxfmtrc.json" …`) — same files, different
-> scope directory. Point your `.npmrc` at the registry for that scope:
-> `@jgeschwendt:registry=https://npm.pkg.github.com`.
 
 ## Relationship to the repo root
 

@@ -8,16 +8,23 @@
   // relaxes or retunes individual rules. This mirrors @jlg/eslint, which loads
   // the `all` config of every plugin and then subtracts.
   //
-  // NOTE: type-aware rules are ENABLED (as of 2026-07-19, TS 7.0). tsgolint
-  // (oxlint's type-aware engine) requires the `oxlint-tsgolint` package and
-  // TypeScript 7+; both are in place. Type-aware linting is switched on via
-  // `options.typeAware: true` in the CONSUMING root .oxlintrc.json ONLY — that
-  // flag is not honored in an extended config, so it must never be set here.
+  // NOTE: type-aware rules are ENABLED. tsgolint (oxlint's type-aware engine)
+  // requires the `oxlint-tsgolint` package and TypeScript 7+; both are in place.
+  // oxlint 1.82.0 declares `peerDependencies: { "oxlint-tsgolint": ">=7.0.2001" }`,
+  // and the trio oxlint 1.82.0 + oxlint-tsgolint 7.0.2001 + typescript 7.0.2 was
+  // probed directly — `typescript/no-floating-promises` fires (verified
+  // 2026-09-08 · direct probe). Type-aware linting is switched on via
+  // `options.typeAware: true` in the CONSUMING root config, never here: the
+  // configuration schema documents `options` as "Only supported in the root
+  // configuration file". (An extended config's `options` were OBSERVED to take
+  // effect at oxlint 1.78, 1.80 and 1.82 — probed 2026-09-08 — but this base
+  // does not build on behavior the vendor documents as unsupported: an upstream
+  // fix would turn it into a silent no-op for every consumer.)
   // Type-checked `typescript/*` rules are retuned in the "type-aware retuning"
   // section below. See README.md.
   //
   // stele:landmark oxlint-tsgolint-pairing
-  // FOOTGUN (verified 2026-07-19, oxlint 1.74): an unknown rule NAME makes oxlint
+  // FOOTGUN (re-verified 2026-09-08 · probe, oxlint 1.82): an unknown rule NAME makes oxlint
   // reject this ENTIRE config ("Rule 'x' not found in plugin 'y'") — nothing then
   // lints. A rule whose plugin is not in `plugins` is worse: it parses, exits 0,
   // and silently never runs. Both are caught by __tests__/rule-existence.test.js;
@@ -80,9 +87,17 @@
       },
     ],
     "no-void": ["error", { "allowAsStatement": true }],
+    // Implemented in oxlint 1.78 ("linter/eslint: Implement `one-var` rule
+    // (#24470)", oxc apps/oxlint/CHANGELOG.md at tag oxlint_v1.78.0; verified
+    // 2026-09-08), in the `style` category — so left alone it would land at
+    // error with oxlint's own default option, "always" (combine declarations),
+    // the opposite of this stack's policy. The authored @jlg/eslint value was
+    // ["error", "never"]; ported verbatim. Naming a 1.78-only rule is why the
+    // oxlint peer is ^1.78.0 (PEER COUPLING): an older consumer hard-fails this
+    // whole config on the unknown name — probed 2026-09-08: oxlint 1.75 exits
+    // with "Rule 'one-var' not found in plugin 'eslint'". (2026-09-08)
+    "one-var": ["error", "never"],
     "sort-imports": ["error", { "ignoreDeclarationSort": true }],
-
-    // DROPPED: `one-var` — does not exist in oxlint.
 
     "capitalized-comments": "off",
     "max-lines": "off",
@@ -108,18 +123,39 @@
     // stack's authored policy has always been per-context (the eslint-era
     // config tuned `func-style` per Next file type; jlg.io turns `func-style`
     // off outright because it mixes styles deliberately). A blanket opinion is
-    // wrong-fit — off. Naming a 1.75-only rule is also why the oxlint peer is
-    // ^1.75.0: a 1.74 consumer would hard-fail this whole config on the
-    // unknown name. (2026-07-23)
+    // wrong-fit — off. Naming it puts a floor of oxlint >=1.75 under this config
+    // (PEER COUPLING — a 1.74 consumer would hard-fail on the unknown name); the
+    // declared peer is the MAX of every such floor, now ^1.78.0 because of
+    // `one-var` above. (2026-07-23; peer note updated 2026-09-08)
     "react/function-component-definition": "off",
     // Automatic JSX Transform (React 17+).
     "react/react-in-jsx-scope": "off",
 
+    // REACT COMPILER REVIEW (2026-09-08). oxlint 1.80 added 22 React Compiler
+    // rules to the `react` plugin — https://oxc.rs/blog/2026-08-18-react-compiler-support
+    // — spread across correctness (error-boundaries, globals, immutability,
+    // incompatible-library, preserve-manual-memoization, purity, refs,
+    // set-state-in-effect, set-state-in-render, static-components, use-memo,
+    // void-use-memo), perf (no-deriving-state-in-effects), suspicious
+    // (capitalized-calls, exhaustive-effect-dependencies, hooks,
+    // memo-dependencies) and restriction (invariant, rule-suppression, syntax,
+    // todo, unsupported-syntax). All 22 are category-activated here, so the
+    // correctness/perf/suspicious ones are at error and the restriction ones at
+    // warn. Reviewed and KEPT as-is — including the five upstream's own ESLint
+    // preset ships OFF (no-deriving-state-in-effects, capitalized-calls,
+    // exhaustive-effect-dependencies, hooks, memo-dependencies): jgeschwendt/jlg.io,
+    // a Next.js consumer of this base with typeAware, has green CI on main at
+    // oxlint 1.81 with none of them disabled (runs 2026-09-07/08). Deliberately
+    // NOT named in `rules` — naming even one would raise the peer to ^1.80.0
+    // (PEER COUPLING). A consumer that wants one off turns it off in its own
+    // root config. The old nursery rule `react/react-compiler` was removed in
+    // 1.80 in favor of these 22; it was never named here, so nothing to remove.
+
     // --- type-aware retuning (tsgolint) ----------------------------------
     // These rules require type information and only fire when the root config
     // sets `options.typeAware: true` (which also needs the `oxlint-tsgolint`
-    // package). typeAware is enabled ONLY in the consuming root .oxlintrc.json,
-    // never here — an extended config cannot turn it on. Retune noisy
+    // package). typeAware is enabled in the consuming root config, never here
+    // (schema: `options` is root-only — see the NOTE at the top). Retune noisy
     // type-checked rules below.
 
     // prefer-readonly-parameter-types demands a `readonly` type on every
@@ -152,6 +188,15 @@
       ],
       "rules": {
         "import/no-default-export": "off",
+      },
+    },
+
+    // Next.js declares `register()` in instrumentation as async by convention,
+    // and it often has nothing to await. Ported from @jlg/eslint. (2026-09-08)
+    {
+      "files": ["**/instrumentation.{js,ts}"],
+      "rules": {
+        "typescript/require-await": "off",
       },
     },
 

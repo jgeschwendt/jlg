@@ -1,15 +1,24 @@
 {
-  "name": "@jlg/tsconfig",
-  "version": "0.1.0",
-  "type": "module",
-  "exports": "./tsconfig.json",
-  "files": [
-    "tsconfig.json"
-  ],
   "devDependencies": {
     "typescript": "^7.0.2"
   },
+  "exports": "./tsconfig.json",
+  "files": [
+    "README.md",
+    "tsconfig.json"
+  ],
+  "name": "@jlg/tsconfig",
   "peerDependencies": {
     "typescript": "^7.0.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgeschwendt/typescript.git",
+    "directory": "packages/tsconfig"
+  },
+  "type": "module",
+  "version": "0.1.0"
 }
